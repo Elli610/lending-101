@@ -5,12 +5,14 @@ pragma solidity ^0.6.0;
 import "./IExerciceSolution.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./IPool.sol";
+import "./Evaluator.sol";
 
 contract aaveUser is IExerciceSolution {
     ERC20 public aDAI;
     ERC20 public DAI;
     ERC20 public USDC;
     IPool public aaveProxy;
+    Evaluator public evaluator;
 
 
     constructor() public {
@@ -18,6 +20,7 @@ contract aaveUser is IExerciceSolution {
         aDAI = ERC20(0xADD98B0342e4094Ec32f3b67Ccfd3242C876ff7a); 
         DAI = ERC20(0xBa8DCeD3512925e52FE67b1b5329187589072A55);
         USDC = ERC20(0x65aFADD39029741B3b8f0756952C74678c9cEC93);
+        evaluator = Evaluator(0xaeaD98593a19074375cCf3ec22E111ce48C02c7E);
     }
     
 
@@ -53,7 +56,13 @@ contract aaveUser is IExerciceSolution {
         DAI.transfer(msg.sender, DAI.balanceOf(address(this)));
     }
 
-    function money(uint amount) external {
-        USDC.transfer(msg.sender, amount*10**6);
-    } 
+    function withdrawUsdc() external {
+        USDC.transfer(msg.sender, USDC.balanceOf(address(this)));
+    }
+
+
+    require(USDC.balanceOf(address(this)) > 1*10**6, "USDC balance should be >1");
+    require(DAI.balanceOf(address(this)) > 1000*10**18, "DAI balance should be >1000");
+
+
 }
